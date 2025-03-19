@@ -69,7 +69,8 @@ def display_features(audio_path:str, J:int, Q:int) -> None:
 if __name__ == "__main__":
 
     # params
-    audio_path = "data/H02_20230420_112000.ogg"
+    audio_path = "data/126247/iNat1109254.ogg"
+    audio_path = "data/21211/XC896839.ogg"
     
     # run
     display_features(audio_path, 5, 7)
