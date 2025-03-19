@@ -5,8 +5,18 @@ import matplotlib.pyplot as plt
 from kymatio.torch import Scattering1D
 
 
-def display_coeff(audio_path):
-    """ """
+def extract_features(audio_path:str, J:int, Q:int):
+    """Extract features from audio file
+    
+    Args:
+        audio_path (str) : path to audio file
+        J (int) : Nombre d'échelles (contrôle la résolution temps/fréquence)
+        Q (int) : Nombre de bandes de fréquences par octave 
+
+    Returns:
+        tensor : extracted features
+    
+    """
 
     # Charger l'audio
     y, sr = librosa.load(audio_path, sr=None)  # sr=None pour garder le taux d'échantillonnage original
@@ -17,10 +27,6 @@ def display_coeff(audio_path):
     # Afficher des informations
     print(f"[+] Fréquence d'échantillonnage : {sr} Hz")
     print(f"[+] Nombre d'échantillons : {len(y)}")
-
-    # Définition des paramètres du Scattering Transform
-    J = 6  # Nombre d'échelles (contrôle la résolution temps/fréquence)
-    Q = 8  # Nombre de bandes de fréquences par octave
 
     # Définition du module de Scattering
     scattering = Scattering1D(J=J, shape=(len(y),), Q=Q)
@@ -33,6 +39,21 @@ def display_coeff(audio_path):
 
     # Affichage des dimensions du résultat
     print(f"[+] Dimensions des features extraites : {scattered_features.shape}")
+
+    return scattered_features
+
+def display_features(audio_path:str, J:int, Q:int) -> None:
+    """ Display features from audio file
+
+    Args:
+        audio_path (str) : path to audio file
+        J (int) : Nombre d'échelles (contrôle la résolution temps/fréquence)
+        Q (int) : Nombre de bandes de fréquences par octave 
+        
+    """
+
+    # extract features
+    scattered_features = extract_features(audio_path, J,Q)
 
     # plot figure
     plt.figure(figsize=(10, 5))
@@ -51,4 +72,5 @@ if __name__ == "__main__":
     audio_path = "data/H02_20230420_112000.ogg"
     
     # run
-    display_coeff(audio_path)
+    display_features(audio_path, 5, 7)
+    # x = extract_features(audio_path, 6,8)
