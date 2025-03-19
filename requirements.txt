@@ -3,3 +3,5 @@ librosa
 kymatio
 torch
 matplotlib
+pandas
+scikit-learn
