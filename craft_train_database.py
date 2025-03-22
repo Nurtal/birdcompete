@@ -1,13 +1,22 @@
 import os
 import shutil
 import glob
+import pandas as pd
 from pydub import AudioSegment
+from tqdm import tqdm
 
 
 
+def craft_train_db(sample_duration:int, original_data_folder:str, output_train_folder:str) -> None:
+    """Craft a train dataset and a label file associated. Each audio sample is chunk into small part
+    of provided duration.
 
-def craft_train_db(sample_duration:int, original_data_folder:str, output_train_folder:str):
-    """ """
+    Args:
+        - sample_duration (int) : lenght of audio sample for the train dataset (miliseconds)
+        - original_data_folder (str) : path to the original data folder
+        - output_train_folder (str) : path to the folder generated for the train dataset
+    
+    """
 
     # test if original data folder exist
     if not os.path.isdir(original_data_folder):
@@ -19,14 +28,18 @@ def craft_train_db(sample_duration:int, original_data_folder:str, output_train_f
         shutil.rmtree(output_train_folder)
     os.mkdir(output_train_folder)
 
+    # init labels
+    labels = []
+
     # transfert
     cmpt = 0
     cmpt_chunk = 0
-    for folder in glob.glob(f"{original_data_folder}/*"):
+    for folder in tqdm(glob.glob(f"{original_data_folder}/*"), desc="Crafting dataset ..."):
 
         output_folder = folder.split("/")[-1]
         output_folder = f"{output_train_folder}/{output_folder}"
         os.mkdir(output_folder)
+        label = folder.split("/")[-1]
 
         for audio_file in glob.glob(f"{folder}/*.ogg"):
 
@@ -46,20 +59,18 @@ def craft_train_db(sample_duration:int, original_data_folder:str, output_train_f
                 # Vérifier que le chunk est bien de la taille requise
                 if len(chunk) == sample_duration:
                     chunk.export(output_file_name, format="ogg")
+                    labels.append({'ID':output_file_name, 'LABEL':label})
 
                 # udpate cmpt
                 cmpt_chunk+=1
 
+    # write label file
+    df = pd.DataFrame(labels)
+    df.to_csv(f"{output_train_folder}/labels.csv")
+
     # display infos
     print(f"[+] {cmpt} audio files treated")
     print(f"[+] {cmpt_chunk} audio chunk created")
-
-
-    
-
-
-            
-        
 
 
 if __name__ == "__main__":
