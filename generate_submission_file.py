@@ -23,8 +23,8 @@ def generate_random_submission_file():
 
     # craft dataset
     df = pd.DataFrame(data)
-    print(df)
-    
+    df.to_csv("data/submission.csv", index=False)
+   
 
 
 
