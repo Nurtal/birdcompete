@@ -75,4 +75,4 @@ def craft_train_db(sample_duration:int, original_data_folder:str, output_train_f
 
 if __name__ == "__main__":
 
-    craft_train_db(16000, "data/original_dataset", "/tmp/zog")
+    craft_train_db(16000, "data/train_audio", "data/zog1sec")
