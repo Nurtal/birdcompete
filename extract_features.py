@@ -19,6 +19,9 @@ def extract_features(audio_path:str, J:int, Q:int, duration:int):
     
     """
 
+    # param
+    shutup = True
+
     # Charger l'audio
     y, sr = librosa.load(audio_path, sr=None)  # sr=None pour garder le taux d'échantillonnage original
 
@@ -33,8 +36,9 @@ def extract_features(audio_path:str, J:int, Q:int, duration:int):
             y = y[:duration]  # Coupe l'excédent
 
     # Afficher des informations
-    print(f"[EXTRACT-FEATURES] Fréquence d'échantillonnage : {sr} Hz")
-    print(f"[EXTRACT-FEATURES] Nombre d'échantillons : {len(y)}")
+    if not shutup:
+        print(f"[EXTRACT-FEATURES] Fréquence d'échantillonnage : {sr} Hz")
+        print(f"[EXTRACT-FEATURES] Nombre d'échantillons : {len(y)}")
 
     # Définition du module de Scattering
     scattering = Scattering1D(J=J, shape=(len(y),), Q=Q)
@@ -46,7 +50,8 @@ def extract_features(audio_path:str, J:int, Q:int, duration:int):
     scattered_features = scattering(y_torch)
 
     # Affichage des dimensions du résultat
-    print(f"[EXTRACT-FEATURES] Dimensions des features extraites : {scattered_features.shape}")
+    if not shutup:
+        print(f"[EXTRACT-FEATURES] Dimensions des features extraites : {scattered_features.shape}")
 
     return scattered_features
 

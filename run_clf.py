@@ -1,18 +1,26 @@
 import pandas as pd
+import os
 import extract_features
+import craft_clf_figure
 import numpy as np
+import shutil
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from pydub import AudioSegment
 
-def train_classic_clf(label_file):
+def train_classic_clf(label_file:str, result_folder:str):
     """ """
 
     # params
     J = 6 
     Q = 8
+
+    # init result folder
+    if os.path.isdir(result_folder):
+        shutil.rmtree(result_folder)
+    os.mkdir(result_folder)
 
     # load manifest
     df = pd.read_csv(label_file)
@@ -49,11 +57,25 @@ def train_classic_clf(label_file):
     # Prédiction et évaluation
     y_pred = clf.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
-    print(f"[CLF][SVM] ACC : {accuracy * 100:.2f}%")
+    print(f"[CLF] ACC : {accuracy * 100:.2f}%")
+
+    # craft confusion matrix
+    craft_clf_figure.craft_confusion_matrix(y_test, y_pred, f"{result_folder}/confusion_matrix.png")
+
+    # craft histogram repartition in train
+    craft_clf_figure.craft_class_histogram(y_train, f"{result_folder}/train_class_distribution.png")
+
+    # craft histogram repartition in test
+    craft_clf_figure.craft_class_histogram(y_test, f"{result_folder}/test_class_distribution.png")
+
+    # save prediction
+    df = pd.DataFrame({"TRUE_LABEL": y_test, "PREDICTED_LABEL": y_pred})
+    df.to_csv(f"{result_folder}/predicted_labels.csv", index=False)
+
 
     
 
 if __name__ == "__main__":
 
-    train_classic_clf("data/small_labels.csv")
+    train_classic_clf("data/small_labels.csv", "/tmp/zogzog")
     
