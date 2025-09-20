@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 
 
-def craft_train_db(sample_duration:int, original_data_folder:str, output_train_folder:str) -> None:
+def craft_train_db(sample_duration:int, original_data_folder:str, output_train_folder:str, class_list:list) -> None:
     """Craft a train dataset and a label file associated. Each audio sample is chunk into small part
     of provided duration.
 
@@ -15,6 +15,7 @@ def craft_train_db(sample_duration:int, original_data_folder:str, output_train_f
         - sample_duration (int) : lenght of audio sample for the train dataset (miliseconds)
         - original_data_folder (str) : path to the original data folder
         - output_train_folder (str) : path to the folder generated for the train dataset
+        - class_list (list) : liste des classes à prendre en compte, si vide toutes les classes sont utilisées
     
     """
 
@@ -38,31 +39,42 @@ def craft_train_db(sample_duration:int, original_data_folder:str, output_train_f
 
         output_folder = folder.split("/")[-1]
         output_folder = f"{output_train_folder}/{output_folder}"
-        os.mkdir(output_folder)
         label = folder.split("/")[-1]
 
-        for audio_file in glob.glob(f"{folder}/*.ogg"):
+        # check label
+        include_label = False
+        if len(class_list) == 0:
+            include_label = True
+        elif label in class_list:
+            include_label = True
+        if include_label:
+            
+            # create output folder
+            os.mkdir(output_folder)
 
-            # Load audio
-            audio = AudioSegment.from_ogg(audio_file)
-            duree_totale = len(audio)  # Durée totale en millisecondes
-            cmpt+=1
+            # loop over audio file in input folder
+            for audio_file in glob.glob(f"{folder}/*.ogg"):
 
-            # Découpage
-            for i, debut in enumerate(range(0, duree_totale, sample_duration)):
-                fin = min(debut + sample_duration, duree_totale)
-                chunk = audio[debut:fin]
+                # Load audio
+                audio = AudioSegment.from_ogg(audio_file)
+                duree_totale = len(audio)  # Durée totale en millisecondes
+                cmpt+=1
 
-                # get output filename
-                output_file_name = f"{output_folder}/{audio_file.split('/')[-1].split('.')[0]}_chunk_{i}.ogg"
+                # Découpage
+                for i, debut in enumerate(range(0, duree_totale, sample_duration)):
+                    fin = min(debut + sample_duration, duree_totale)
+                    chunk = audio[debut:fin]
 
-                # Vérifier que le chunk est bien de la taille requise
-                if len(chunk) == sample_duration:
-                    chunk.export(output_file_name, format="ogg")
-                    labels.append({'ID':output_file_name, 'LABEL':label})
+                    # get output filename
+                    output_file_name = f"{output_folder}/{audio_file.split('/')[-1].split('.')[0]}_chunk_{i}.ogg"
 
-                # udpate cmpt
-                cmpt_chunk+=1
+                    # Vérifier que le chunk est bien de la taille requise
+                    if len(chunk) == sample_duration:
+                        chunk.export(output_file_name, format="ogg")
+                        labels.append({'ID':output_file_name, 'LABEL':label})
+
+                    # udpate cmpt
+                    cmpt_chunk+=1
 
     # write label file
     df = pd.DataFrame(labels)
@@ -75,4 +87,4 @@ def craft_train_db(sample_duration:int, original_data_folder:str, output_train_f
 
 if __name__ == "__main__":
 
-    craft_train_db(16000, "data/train_audio", "data/zog1sec")
+    craft_train_db(2000, "data/train_audio", "data/zog2sec", ['41778', '48124', '566513'])

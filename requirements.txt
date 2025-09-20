@@ -1,3 +1,5 @@
+tqdm
+xgboost
 seaborn
 numpy
 librosa

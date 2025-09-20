@@ -86,5 +86,5 @@ if __name__ == "__main__":
     audio_path = "data/21211/XC896839.ogg"
     
     # run
-    display_features(audio_path, 5, 7)
+    display_features(audio_path, 3, 4)
     # x = extract_features(audio_path, 6,8)

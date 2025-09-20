@@ -1,4 +1,5 @@
 import pandas as pd
+import xgboost as xgb
 import os
 import extract_features
 import craft_clf_figure
@@ -47,6 +48,7 @@ def train_classic_clf(label_file:str, result_folder:str):
         # load label
         y.append(label)
     
+    
     # Division en ensemble d'entraînement et de test
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -77,5 +79,5 @@ def train_classic_clf(label_file:str, result_folder:str):
 
 if __name__ == "__main__":
 
-    train_classic_clf("data/small_labels.csv", "/tmp/zogzog")
+    train_classic_clf("data/zog2sec/labels.csv", "/tmp/zogzog")
     
