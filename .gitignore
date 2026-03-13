@@ -1,2 +1,4 @@
 birdenv/*
 data/*
+venv/*
+__pycache__/*
